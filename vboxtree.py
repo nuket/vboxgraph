@@ -69,28 +69,76 @@ def hddStateName(manager, hddStateInt):
 def hddVariantName(manager, hddVariantInt):
     return constantValueToName(manager, hddVariantInt, 'MediumVariant')
 
+def hddInfo(manager, hdd):
+    return "({format:4}) {type:12} {state:12} {id} {size:>5}MB {logicalSize:>5}MB {location}".format(
+        location=hdd.location,
+        format=hdd.format,
+        id=hdd.id,
+        size=int(hdd.size) / (1024 * 1024),
+        logicalSize=int(hdd.logicalSize) / (1024 * 1024),
+        type=hddTypeName(manager, hdd.type),
+        state=hddStateName(manager, hdd.state))
+
+def stripBrackets(name):
+    return name.replace('{', '').replace('}', '')
+
+
+def hddMachineMapping(hddName, machineName, indent):
+    INDENTATION = '\t' * indent
+
+    return "{indentation}{hddName} -> [{machineName}]".format(indentation=INDENTATION,
+                                                            hddName=hddName,
+                                                            machineName=machineName)
+
+#
+# Maps disks to machines.
+#
+def graphDiskMachineIds(manager, hddName, machineIds, indent):
+    if machineIds is None:
+        print hddMachineMapping(hddName, 'NOT ATTACHED', indent)
+        return
+
+    for machineId in machineIds:
+        machine = manager.vbox.FindMachine(machineId)
+
+        hddName     = stripBrackets(hddName)
+        machineName = stripBrackets(machine.name)
+
+        print hddMachineMapping(hddName, machineName, indent)
+    
+
+#
+# Recursively descend into the virtual disk tree.
+#
+def graphDiskChildren(manager, hdd, indent):
+    INDENTATION = '\t' * indent
+
+    for hdd in hdd.children:
+        parentName = stripBrackets(hdd.parent.name)
+        childName  = stripBrackets(hdd.name)
+
+        print "{indentation}{child} -> {parent}".format(indentation=INDENTATION,
+                                                        parent=parentName,
+                                                        child=childName)
+
+        graphDiskMachineIds(manager, hdd.name, hdd.machineIds, indent)
+        graphDiskChildren(manager, hdd, indent + 1)
+
+# Returns a list of <win32com.gen_py.VirtualBox Type Library.IMedium instance> objects.
+# 
+# It is a list of "base" disks, i.e. non-snapshot, which should be 
+# walkable down through their "differencing" children.
 def visualizeHdds(manager):
-    # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMedium instance> objects.
-    # 
-    # It is a list of "base" disks, i.e. non-snapshot, which should be 
-    # walkable down through their "differencing" children.
     hdds = manager.getArray(manager.vbox, 'hardDisks')
 
     for hdd in hdds:
         if hdd.state != manager.constants.MediumState_Created:
             hdd.refreshState()
         
-        print "({format:4}) {type:12} {state:12} {id} {size:>5}MB {logicalSize:>5}MB {location}".format(
-            location=hdd.location,
-            format=hdd.format,
-            id=hdd.id,
-            size=int(hdd.size) / (1024 * 1024),
-            logicalSize=int(hdd.logicalSize) / (1024 * 1024),
-            type=hddTypeName(manager, hdd.type),
-            state=hddStateName(manager, hdd.state))
-            # variant=hdd.variant) # hddVariantName(manager, hdd.variant))
+        graphDiskMachineIds(manager, hdd.name, hdd.machineIds, 0)
+        graphDiskChildren(manager, hdd, 0)
 
-    return hdds
+    # return hdds
 
 def listMachines():
     # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMachine instance> objects.
@@ -99,25 +147,13 @@ def listMachines():
 
     return machines
 
+# [(M.name, M.id, M.snapshotCount) for M in machines]
+
     
-def main(argv):
-    from vboxapi import VirtualBoxManager    
-
-    # This is a VirtualBox COM/XPCOM API client, no data needed.    
-    wrapper = VirtualBoxManager(None, None)
-
-    # Get the VirtualBox manager    
-    mgr  = wrapper.mgr    
-
-    # Get the global VirtualBox object    
-    vbox = wrapper.vbox    
-
-    print "Running VirtualBox version %s" %(vbox.version)
-
-    pass
-
 if __name__ == '__main__':
     from vboxapi import VirtualBoxManager
     manager = VirtualBoxManager(None, None)
 
-    main(sys.argv)
+    # print "Running VirtualBox version %s" %(manager.vbox.version)
+
+    visualizeHdds(manager)
