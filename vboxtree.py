@@ -1,6 +1,8 @@
 #
 # Visualize the relationships between VirtualBox VMs.
+#
 # How do the virtual disk images derive from one another?
+# How are the disks attached to the various VMs?
 # 
 # (c) 2013 Max Vilimpoc
 #
@@ -33,39 +35,42 @@ def cleanupComCache():
     shutil.rmtree(comCache1, True)
     shutil.rmtree(comCache2, True)
 
-# Based on vboxshell.py
+def constantValueToName(manager, value, valueType):
+    values = manager.constants.all_values(valueType)
 
-# def listMediaCmd(ctx, args):
-#     if len(args) > 1:
-#         verbose = int(args[1])
-#     else:
-#         verbose = False
-        
-#     hdds = ctx['global'].getArray(ctx['vb'], 'hardDisks')
-#     print colCat(ctx, "Hard disks:")
-#     for hdd in hdds:
-#         if hdd.state != ctx['global'].constants.MediumState_Created:
-#             hdd.refreshState()
-#         print "   %s (%s)%s %s [logical %s]" % (colPath(ctx, hdd.location), hdd.format, optId(verbose, hdd.id), colSizeM(ctx, asSize(hdd.size, True)), colSizeM(ctx, asSize(hdd.logicalSize, True)))
+    for k, v in values.iteritems():
+        if v == value:
+            return k
 
-#     dvds = ctx['global'].getArray(ctx['vb'], 'DVDImages')
-#     print colCat(ctx, "CD/DVD disks:")
-#     for dvd in dvds:
-#         if dvd.state != ctx['global'].constants.MediumState_Created:
-#             dvd.refreshState()
-#         print "   %s (%s)%s %s" % (colPath(ctx, dvd.location), dvd.format, optId(verbose, dvd.id), colSizeM(ctx, asSize(dvd.size, True)))
+    return None
 
-#     floppys = ctx['global'].getArray(ctx['vb'], 'floppyImages')
-#     print colCat(ctx, "Floppy disks:")
-#     for floppy in floppys:
-#         if floppy.state != ctx['global'].constants.MediumState_Created:
-#             floppy.refreshState()
-#         print "   %s (%s)%s %s" % (colPath(ctx, floppy.location), floppy.format, optId(verbose, floppy.id), colSizeM(ctx, asSize(floppy.size, True)))
+def hddTypeName(manager, hddTypeInt):
+    # types = manager.constants.all_values('MediumType')
 
-#     return 0
+    # for k, v in types.iteritems():
+    #     if v == hddTypeInt:
+    #         return k
+
+    # return None
+
+    return constantValueToName(manager, hddTypeInt, 'MediumType')
+
+def hddStateName(manager, hddStateInt):
+    # states = manager.constants.all_values('MediumState')
+
+    # for k, v in states.iteritems():
+    #     if v == hddStateInt:
+    #         return k
+
+    # return None
+
+    return constantValueToName(manager, hddStateInt, 'MediumState')
+
+def hddVariantName(manager, hddVariantInt):
+    return constantValueToName(manager, hddVariantInt, 'MediumVariant')
 
 def visualizeHdds(manager):
-    # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMedium instance at 0x62921096> objects.
+    # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMedium instance> objects.
     # 
     # It is a list of "base" disks, i.e. non-snapshot, which should be 
     # walkable down through their "differencing" children.
@@ -75,13 +80,24 @@ def visualizeHdds(manager):
         if hdd.state != manager.constants.MediumState_Created:
             hdd.refreshState()
         
-        print "({format:4}) {id} {size:>5}MB {logicalSize:>5}MB {location}".format(location=hdd.location,
-                                                                                   format=hdd.format,
-                                                                                   id=hdd.id,
-                                                                                   size=int(hdd.size) / (1024 * 1024),
-                                                                                   logicalSize=int(hdd.logicalSize) / (1024 * 1024))
+        print "({format:4}) {type:12} {state:12} {id} {size:>5}MB {logicalSize:>5}MB {location}".format(
+            location=hdd.location,
+            format=hdd.format,
+            id=hdd.id,
+            size=int(hdd.size) / (1024 * 1024),
+            logicalSize=int(hdd.logicalSize) / (1024 * 1024),
+            type=hddTypeName(manager, hdd.type),
+            state=hddStateName(manager, hdd.state))
+            # variant=hdd.variant) # hddVariantName(manager, hdd.variant))
 
-        #    %s (%s)%s %s [logical %s]" % hdd.location, hdd.format, hdd.id, hdd.size, hdd.logicalSize
+    return hdds
+
+def listMachines():
+    # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMachine instance> objects.
+    # machines = manager.getArray(manager.vbox, 'machines')
+    machines = manager.vbox.machines
+
+    return machines
 
     
 def main(argv):
@@ -101,4 +117,7 @@ def main(argv):
     pass
 
 if __name__ == '__main__':
+    from vboxapi import VirtualBoxManager
+    manager = VirtualBoxManager(None, None)
+
     main(sys.argv)
