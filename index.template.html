@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>VirtualBox Drive / Machine Map</title>
+  </head>
+  <body>
+    <script type="text/vnd.graphviz" id="cluster">
+      digraph G {
+        subgraph cluster_machines {
+          {{ cluster_machines }}
+        }
+
+        {{ disk_hierarchy }}
+
+        {{ current_attachment_map }}
+
+        subgraph cluster_root_drives {
+          {{ cluster_root_drives }}
+        }
+      }
+    </script>
+    <script src="libs/viz.js"></script>
+    <script>
+      function inspect(s) {
+        return "<pre>" + s.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") + "</pre>";
+      }
+      
+      function src(id) {
+        return document.getElementById(id).innerHTML;
+      }
+
+      function example(id, format) {
+        var result;
+        try {
+          result = Viz(src(id), format);
+          if (format === "svg")
+            return result;
+          else
+            return inspect(result);
+        } catch(e) {
+          return inspect(e.toString());
+        }
+      }
+
+      document.body.innerHTML += "<h1>VirtualBox Drive / Machine Map (SVG output)</h1>";
+      document.body.innerHTML += '<code><span style="color: red;">red lines</span></code> indicate the disk image that is currently being used by the Virtual Machine, these are usually going to be differencing disks related to a machine\'s snapshot';
+      document.body.innerHTML += '<br/>'
+      document.body.innerHTML += '<code>black lines</code> simply point from child images to parent images';
+
+      document.body.innerHTML += example("cluster", "svg");
+    </script>
+  </body>
+</html>

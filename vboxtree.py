@@ -29,17 +29,6 @@ sys.path.append(VBOX_API_PATH)
 
 NO_MACHINE = 'NOT ATTACHED'
 
-# Based on vboxapisetup.py
-
-def cleanupComCache():
-    import shutil
-    from distutils.sysconfig import get_python_lib
-    comCache1 = os.path.join(get_python_lib(),'win32com', 'gen_py')
-    comCache2 = os.path.join(os.environ.get("TEMP", "c:\\tmp"), 'gen_py')
-    print "Cleaning COM cache at",comCache1,"and",comCache2
-    shutil.rmtree(comCache1, True)
-    shutil.rmtree(comCache2, True)
-
 def constantValueToName(manager, value, valueType):
     values = manager.constants.all_values(valueType)
 
@@ -50,25 +39,9 @@ def constantValueToName(manager, value, valueType):
     return None
 
 def hddTypeName(manager, hddTypeInt):
-    # types = manager.constants.all_values('MediumType')
-
-    # for k, v in types.iteritems():
-    #     if v == hddTypeInt:
-    #         return k
-
-    # return None
-
     return constantValueToName(manager, hddTypeInt, 'MediumType')
 
 def hddStateName(manager, hddStateInt):
-    # states = manager.constants.all_values('MediumState')
-
-    # for k, v in states.iteritems():
-    #     if v == hddStateInt:
-    #         return k
-
-    # return None
-
     return constantValueToName(manager, hddStateInt, 'MediumState')
 
 def hddVariantName(manager, hddVariantInt):
@@ -85,17 +58,6 @@ def hddInfo(manager, hdd):
         state=hddStateName(manager, hdd.state))
 
 def hddIsDifferencing(manager, hdd):
-    # TYPES    = manager.constants.all_values('MediumType')
-    # VARIANTS = manager.constants.all_values('MediumVariant')
-
-    # print 'Type:    {0}'.format(hdd.type)
-    # print 'Variant: {0}'.format(hdd.variant)
-
-    # if (hdd.type == TYPES['Normal'] and hdd.variant == VARIANTS['Diff']):
-    #     print hdd.name
-
-    #     return True
-
     if hdd.parent is not None:
         # print "Differencing: {0}".format(hdd.name)
         return True
@@ -123,11 +85,17 @@ def hddMachineMapping(hddName, machineName, indent):
                                                                    hddName=hddName,
                                                                    machineName=machineName)
 
+def hddName(manager, hdd):
+    if hddIsDifferencing(manager, hdd):
+        return stripBrackets(hdd.name)
+    else:
+        return stripBrackets('{hddName} ({hddId})'.format(hddName=hdd.name,
+                                                          hddId=hdd.id[0:8]))
+
 #
 # Maps disks to machines.
 #
-def graphDiskMachineIds(manager, hdd, indent):
-    hddName    = hdd.name
+def graphDiskMachineIds(manager, hdd, indent, output=[]):
     machineIds = hdd.machineIds
 
     # If the disk is a differencing disk, don't 
@@ -136,62 +104,61 @@ def graphDiskMachineIds(manager, hdd, indent):
         return
 
     if machineIds is None:
-        print hddMachineMapping(hddName, NO_MACHINE, indent)
+        output.append(hddMachineMapping(hddName(manager, hdd), NO_MACHINE, indent))
         return
 
     for machineId in machineIds:
         machine = manager.vbox.FindMachine(machineId)
 
-        hddName     = stripBrackets(hddName)
         machineName = stripBrackets(machine.name)
 
-        print hddMachineMapping(hddName, machineName, indent)
+        output.append(hddMachineMapping(hddName(manager, hdd), machineName, indent))
 
 #
 # Recursively descend into the virtual disk tree.
 #
-def graphDiskChildren(manager, hdd, indent):
+def graphDiskChildren(manager, hdd, indent, output=[]):
     INDENTATION = '\t' * indent
 
     for hdd in hdd.children:
-        parentName = stripBrackets(hdd.parent.name)
-        childName  = stripBrackets(hdd.name)
+        parentName = hddName(manager, hdd.parent)
+        childName  = hddName(manager, hdd)
 
         # if hddIsMultiAttach(manager, hdd):
         #     hddType = 'MultiAttach'
         # else:
         #     hddType = ''
 
-        print '{indentation}"{child}" -> "{parent}";'.format(indentation=INDENTATION,
-                                                             parent=parentName,
-                                                             child=childName)
+        output.append('{indentation}"{child}" -> "{parent}";'.format(indentation=INDENTATION,
+                                                                     parent=parentName,
+                                                                     child=childName))
                                                              
 
-        graphDiskMachineIds(manager, hdd, indent)
-        graphDiskChildren(manager, hdd, indent + 1)
+        graphDiskMachineIds(manager, hdd, indent, output)
+        graphDiskChildren(manager, hdd, indent + 1, output)
 
 # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMedium instance> objects.
 # 
 # It is a list of "base" disks, i.e. non-snapshot, which should be 
 # walkable down through their "differencing" children.
-def visualizeHdds(manager):
+def visualizeHdds(manager, output=[]):
     hdds = manager.getArray(manager.vbox, 'hardDisks')
 
     for hdd in hdds:
         if hdd.state != manager.constants.MediumState_Created:
             hdd.refreshState()
         
-        graphDiskMachineIds(manager, hdd, 0)
-        graphDiskChildren(manager, hdd, 0)
+        graphDiskMachineIds(manager, hdd, 0, output)
+        graphDiskChildren(manager, hdd, 0, output)
 
     # return hdds
 
-def listMachines():
-    # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMachine instance> objects.
-    # machines = manager.getArray(manager.vbox, 'machines')
-    machines = manager.vbox.machines
+# def listMachines():
+#     # Returns a list of <win32com.gen_py.VirtualBox Type Library.IMachine instance> objects.
+#     # machines = manager.getArray(manager.vbox, 'machines')
+#     machines = manager.vbox.machines
 
-    return machines
+#     return machines
 
 
 def formatMachineName(name):
@@ -201,20 +168,22 @@ def formatMachineName(name):
                                              name=name)
 
 
-def graphMachineCluster(manager):
-    print 'subgraph cluster_machines {'
+def graphMachineCluster(manager, output=[]):
+    # print 'subgraph cluster_machines {'
 
     names = [formatMachineName(machine.name) for machine in manager.vbox.machines]
     names.append(formatMachineName(NO_MACHINE))
+
+    output.extend(names)
     
-    print '\n'.join(sorted(names))
+    # print '\n'.join(sorted(names))
 
     # for machine in manager.vbox.machines:
     #     print formatMachineName(machine.name)
 
     # print formatMachineName(NO_MACHINE)
 
-    print '}'        
+    # print '}'        
 
 def isHardDisk(manager, deviceType):
     TYPES = manager.constants.all_values('DeviceType')
@@ -226,23 +195,44 @@ def isHardDisk(manager, deviceType):
 
     return False
 
-def graphLatestVdi(manager):
+def machineHddMapping(machineName, hddName, indent):
+    INDENTATION = '\t' * indent
+
+    return '{indentation}"[{machineName}]" -> "{hddName}";'.format(indentation=INDENTATION,
+                                                                   hddName=hddName,
+                                                                   machineName=machineName)
+
+
+def graphLatestVdi(manager, output=[]):
     for machine in manager.vbox.machines:
         attachments = machine.mediumAttachments
 
         if len(attachments):
             for A in attachments:
                 try:
-                    hddName = A.medium.name
-
                     if isHardDisk(manager, A.medium.deviceType):
-                        print hddMachineMapping(stripBrackets(hddName), machine.name, 0)
+                        output.append('edge [color=red];')
+                        # output.append(machineHddMapping(machine.name, stripBrackets(hddName), 0))
+                        output.append(hddMachineMapping(hddName(manager, A.medium), machine.name, 0))
 
                 except AttributeError:
                     continue
 
+def graphDriveCluster(manager, output=[]):
+    hdds = manager.getArray(manager.vbox, 'hardDisks')
 
-# [(M.name, M.id, M.snapshotCount) for M in machines]
+    for hdd in hdds:
+        if hdd.state != manager.constants.MediumState_Created:
+            hdd.refreshState()
+
+        output.append('"{hddName}"'.format(hddName=stripBrackets(hdd.name)))
+
+def outputEverything(manager, renderables={}):
+    from jinja2 import Template
+    
+    template = Template(open('index.template.html', 'r').read())
+    return template.render(renderables)
+
 
     
 if __name__ == '__main__':
@@ -251,4 +241,21 @@ if __name__ == '__main__':
 
     # print "Running VirtualBox version %s" %(manager.vbox.version)
 
-    visualizeHdds(manager)
+    hddGraph = []
+    visualizeHdds(manager, hddGraph)
+    
+    machineCluster = []
+    graphMachineCluster(manager, machineCluster)
+
+    latestAttachedDisks = []
+    graphLatestVdi(manager, latestAttachedDisks)
+
+    driveCluster = []
+    graphDriveCluster(manager, driveCluster)
+
+    # Plug the variables into the template and print
+    everything = outputEverything(manager, {'cluster_machines':       '\n'.join(machineCluster),
+                                            'disk_hierarchy':         '\n'.join(hddGraph),
+                                            'current_attachment_map': '\n'.join(latestAttachedDisks)})
+                                            # 'cluster_root_drives':    '\n'.join(driveCluster)})
+    

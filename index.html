@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>VirtualBox Drive / Machine Map</title>
+  </head>
+  <body>
+    <script type="text/vnd.graphviz" id="cluster">
+      digraph G {
+        subgraph cluster_machines {
+"Machine A";
+"Machine B";
+"Machine C";
+"Machine D";
+"Machine E";
+"Machine F";
+"Machine G";
+"Machine H";
+"Machine I";
+"Machine J";
+"Machine K";
+"Machine L";
+"Machine M";
+"Machine N";
+"Machine O";
+"Machine P";
+"Machine Q";
+"Machine R";
+"Machine S";
+"[NOT ATTACHED]";
+        }
+
+"Disk A.vdi (b70036e8)" -> "[NOT ATTACHED]";
+"5cb782d1-8aa3-4db3-8abf-32fff4363b5d.vdi" -> "Disk A.vdi (b70036e8)";
+"3bd6129e-b487-44b7-8386-e49c8da5f1bd.vdi" -> "5cb782d1-8aa3-4db3-8abf-32fff4363b5d.vdi";
+"9fb06176-4b23-4d81-b4ab-ab815ca70b00.vdi" -> "3bd6129e-b487-44b7-8386-e49c8da5f1bd.vdi";
+"543665db-66d7-4115-b2af-3edb76ca578b.vdi" -> "3bd6129e-b487-44b7-8386-e49c8da5f1bd.vdi";
+"2a5dc768-070b-48b9-9b88-cd1365cafe8e.vdi" -> "5cb782d1-8aa3-4db3-8abf-32fff4363b5d.vdi";
+"dfbd73ff-66fc-4f7c-b5dc-8f88e6f4dc84.vdi" -> "Disk A.vdi (b70036e8)";
+"4f754f86-b74d-4148-9125-e862d47ebb1e.vdi" -> "dfbd73ff-66fc-4f7c-b5dc-8f88e6f4dc84.vdi";
+"d037664b-6335-4f4b-bcb2-d0f739907071.vdi" -> "Disk A.vdi (b70036e8)";
+"f6a347d8-c87a-4d33-8fa9-6b5690369e98.vdi" -> "Disk A.vdi (b70036e8)";
+"7436967d-a51a-438e-a046-df2011e8813b.vdi" -> "Disk A.vdi (b70036e8)";
+"0c2d4670-55d6-4031-9732-287068306c7c.vdi" -> "Disk A.vdi (b70036e8)";
+"21466975-a0ab-4041-a69f-a4637ea6a582.vdi" -> "0c2d4670-55d6-4031-9732-287068306c7c.vdi";
+"a92d0db4-aedd-4a3c-b7f5-1346ef933693.vdi" -> "21466975-a0ab-4041-a69f-a4637ea6a582.vdi";
+"Disk B.vdi (23de3230)" -> "Machine E";
+"Disk C.vdi (9b1e4969)" -> "Machine G";
+"a8ed04ba-7ef7-4de2-964f-e541d8adfb50.vdi" -> "Disk C.vdi (9b1e4969)";
+"c58af81e-d587-4625-9bcf-1733f9ad5750.vdi" -> "a8ed04ba-7ef7-4de2-964f-e541d8adfb50.vdi";
+"316e4d9f-daf1-49aa-b07f-abe58a578119.vdi" -> "Disk C.vdi (9b1e4969)";
+"a1efab4a-6c44-46f3-b0b7-2da966d385e8.vdi" -> "316e4d9f-daf1-49aa-b07f-abe58a578119.vdi";
+"e394ccd3-bf12-412f-8fe2-4346e9f0fdbc.vdi" -> "a1efab4a-6c44-46f3-b0b7-2da966d385e8.vdi";
+"2b7b1355-5a35-4892-95c3-817cd3771d59.vdi" -> "e394ccd3-bf12-412f-8fe2-4346e9f0fdbc.vdi";
+"8cd083d4-f4a3-4f7a-80a2-4906fa4c753e.vdi" -> "2b7b1355-5a35-4892-95c3-817cd3771d59.vdi";
+"d1bda040-2737-4447-9c02-9d3d685bd9ed.vdi" -> "8cd083d4-f4a3-4f7a-80a2-4906fa4c753e.vdi";
+"f203c4cd-d686-4471-83d2-353d7d7e4acf.vdi" -> "a1efab4a-6c44-46f3-b0b7-2da966d385e8.vdi";
+"66e9fde8-12b0-4536-b442-6fdc9a6041a8.vdi" -> "f203c4cd-d686-4471-83d2-353d7d7e4acf.vdi";
+"92ec2820-4778-45c7-9bd8-88abd2cfe1f4.vdi" -> "66e9fde8-12b0-4536-b442-6fdc9a6041a8.vdi";
+"289833be-e342-4405-848e-71db9e35be4a.vdi" -> "92ec2820-4778-45c7-9bd8-88abd2cfe1f4.vdi";
+"9c5a0440-c951-4557-8c39-fffc9c579af7.vdi" -> "a1efab4a-6c44-46f3-b0b7-2da966d385e8.vdi";
+"5aeda64c-e7d3-48d3-a3c9-dd1fbcef028d.vdi" -> "9c5a0440-c951-4557-8c39-fffc9c579af7.vdi";
+"1eab9e04-686d-4296-8067-eca095c4b78d.vdi" -> "5aeda64c-e7d3-48d3-a3c9-dd1fbcef028d.vdi";
+"2ad22e12-a61a-4e12-94a7-47fc11c202f6.vdi" -> "a1efab4a-6c44-46f3-b0b7-2da966d385e8.vdi";
+"d4a06a08-9f1f-4d90-8120-86ba4624a0c4.vdi" -> "2ad22e12-a61a-4e12-94a7-47fc11c202f6.vdi";
+"6e8a509e-4bc5-4598-b192-e2b896b6b4fd.vdi" -> "d4a06a08-9f1f-4d90-8120-86ba4624a0c4.vdi";
+"2c6115aa-e944-48eb-a53e-6428b09dcc34.vdi" -> "6e8a509e-4bc5-4598-b192-e2b896b6b4fd.vdi";
+"35bf0553-9990-415e-a6ae-562ed58f958a.vdi" -> "2c6115aa-e944-48eb-a53e-6428b09dcc34.vdi";
+"7e5e5689-65cd-4652-a0f5-9d4d44923513.vdi" -> "a1efab4a-6c44-46f3-b0b7-2da966d385e8.vdi";
+"c3e2f34d-06ca-4ceb-9f82-37790ca1ae54.vdi" -> "7e5e5689-65cd-4652-a0f5-9d4d44923513.vdi";
+"9d8d73d0-3aeb-469d-87d8-052b04f98216.vdi" -> "7e5e5689-65cd-4652-a0f5-9d4d44923513.vdi";
+"Disk D.vdi (e913606a)" -> "Machine I";
+"a116716b-cfb8-4561-85e2-2c8d562281cc.vdi" -> "Disk D.vdi (e913606a)";
+"1a971550-b333-43f4-be33-a602670253a0.vdi" -> "a116716b-cfb8-4561-85e2-2c8d562281cc.vdi";
+"3dab88b5-dbd3-4278-bfbc-f79add72a77d.vdi" -> "1a971550-b333-43f4-be33-a602670253a0.vdi";
+"Disk E.vdi (ae2c01b6)" -> "Machine J";
+"d0df38e5-23e3-4bef-a87c-a2c01334ba9d.vdi" -> "Disk E.vdi (ae2c01b6)";
+"724861d4-d63a-4cc7-90bb-e415c891f1de.vdi" -> "d0df38e5-23e3-4bef-a87c-a2c01334ba9d.vdi";
+"f2a91712-585e-4afd-b513-e4b6ca2c4c67.vdi" -> "724861d4-d63a-4cc7-90bb-e415c891f1de.vdi";
+"3c6e6083-a76b-4692-a5b4-7e08fb5ba62b.vdi" -> "724861d4-d63a-4cc7-90bb-e415c891f1de.vdi";
+"6b99ab92-c3ad-4c5f-9bb0-97ddf43197a4.vdi" -> "3c6e6083-a76b-4692-a5b4-7e08fb5ba62b.vdi";
+"box-disk1.vmdk (75373fe1)" -> "Machine R";
+"box-disk1.vmdk (493f8cbb)" -> "Machine S";
+
+edge [color=red];
+"9fb06176-4b23-4d81-b4ab-ab815ca70b00.vdi" -> "Machine A";
+edge [color=red];
+"2a5dc768-070b-48b9-9b88-cd1365cafe8e.vdi" -> "Machine B";
+edge [color=red];
+"4f754f86-b74d-4148-9125-e862d47ebb1e.vdi" -> "Machine C";
+edge [color=red];
+"543665db-66d7-4115-b2af-3edb76ca578b.vdi" -> "Machine D";
+edge [color=red];
+"Disk B.vdi (23de3230)" -> "Machine E";
+edge [color=red];
+"d037664b-6335-4f4b-bcb2-d0f739907071.vdi" -> "Machine F";
+edge [color=red];
+"c3e2f34d-06ca-4ceb-9f82-37790ca1ae54.vdi" -> "Machine G";
+edge [color=red];
+"f6a347d8-c87a-4d33-8fa9-6b5690369e98.vdi" -> "Machine H";
+edge [color=red];
+"3dab88b5-dbd3-4278-bfbc-f79add72a77d.vdi" -> "Machine I";
+edge [color=red];
+"6b99ab92-c3ad-4c5f-9bb0-97ddf43197a4.vdi" -> "Machine J";
+edge [color=red];
+"d1bda040-2737-4447-9c02-9d3d685bd9ed.vdi" -> "Machine K";
+edge [color=red];
+"289833be-e342-4405-848e-71db9e35be4a.vdi" -> "Machine L";
+edge [color=red];
+"1eab9e04-686d-4296-8067-eca095c4b78d.vdi" -> "Machine M";
+edge [color=red];
+"7436967d-a51a-438e-a046-df2011e8813b.vdi" -> "Machine N";
+edge [color=red];
+"a92d0db4-aedd-4a3c-b7f5-1346ef933693.vdi" -> "Machine O";
+edge [color=red];
+"35bf0553-9990-415e-a6ae-562ed58f958a.vdi" -> "Machine P";
+edge [color=red];
+"9d8d73d0-3aeb-469d-87d8-052b04f98216.vdi" -> "Machine Q";
+edge [color=red];
+"box-disk1.vmdk (75373fe1)" -> "Machine R";
+edge [color=red];
+"box-disk1.vmdk (493f8cbb)" -> "Machine S";
+
+        subgraph cluster_root_drives {
+          
+        }
+      }
+    </script>
+    <script src="libs/viz.js"></script>
+    <script>
+      function inspect(s) {
+        return "<pre>" + s.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") + "</pre>";
+      }
+      
+      function src(id) {
+        return document.getElementById(id).innerHTML;
+      }
+
+      function example(id, format) {
+        var result;
+        try {
+          result = Viz(src(id), format);
+          if (format === "svg")
+            return result;
+          else
+            return inspect(result);
+        } catch(e) {
+          return inspect(e.toString());
+        }
+      }
+
+      document.body.innerHTML += "<h1>VirtualBox Drive / Machine Map (SVG output)</h1>";
+      document.body.innerHTML += '<code><span style="color: red;">red lines</span></code> indicate the disk image that is currently being used by the Virtual Machine, these are usually going to be differencing disks related to a machine\'s snapshot';
+      document.body.innerHTML += '<br/>'
+      document.body.innerHTML += '<code>black lines</code> simply point from child images to parent images';
+
+      document.body.innerHTML += example("cluster", "svg");
+    </script>
+  </body>
+</html>
